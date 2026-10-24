@@ -105,6 +105,27 @@ def parse_header(path: str):
     irq_re = re.compile(r"(\w+)_IRQn\s*=\s*(\d+)\s*,")
     interrupts = [(n, int(num)) for n, num in irq_re.findall(src) if int(num) >= 0]
     interrupts.sort(key=lambda x: x[1])
+
+    # 实例补全:头文件底部 CMSIS 宏 #define XXX_BASE 0x...UL 覆盖了
+    # 未单独生成结构体段的实例(如 F030 的 UART2/UART3/GPIOB——结构体与
+    # UART1/GPIOA 同款,仅缺段)。按"去尾数字"归并到已有 Typedef。
+    base_re = re.compile(r"#define\s+(\w+)_BASE\s+(0x[0-9A-Fa-f]+)U?L?\b")
+    have_inst = {i for p in merged for i, _ in p["instances"]}
+    typs = {p["typ"]: p for p in merged}
+    for name, b64 in base_re.findall(src):
+        if name in have_inst:
+            continue
+        # 实例名 → Typedef 推断:原名 → 去尾数字(UART2→UART)→
+        # 去尾大写字母(GPIOB→GPIO,要求剩余 ≥3 字符防误伤)
+        cands = [name, name.rstrip("0123456789")]
+        if name[-1:].isalpha() and name[-1:].isupper() and len(name) > 3:
+            cands.append(name[:-1])
+        for typ in cands:
+            if typ in typs:
+                typs[typ]["instances"].append((name, int(b64, 16)))
+                have_inst.add(name)
+                break
+
     return merged, interrupts
 
 

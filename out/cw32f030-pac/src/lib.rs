@@ -67,24 +67,46 @@ pub const ATIM_BASE: usize = 0x40012c00;
 pub const AWT_BASE: usize = 0x40014c00;
 /// BTIM1(BTIM)基地址
 pub const BTIM1_BASE: usize = 0x40014800;
+/// BTIM2(BTIM)基地址
+pub const BTIM2_BASE: usize = 0x40014900;
+/// BTIM3(BTIM)基地址
+pub const BTIM3_BASE: usize = 0x40014a00;
 /// CRC(CRC)基地址
 pub const CRC_BASE: usize = 0x40023000;
 /// DMA(DMA)基地址
 pub const DMA_BASE: usize = 0x40020000;
 /// DMACHANNEL1(DMACHANNEL)基地址
 pub const DMACHANNEL1_BASE: usize = 0x40020020;
+/// DMACHANNEL2(DMACHANNEL)基地址
+pub const DMACHANNEL2_BASE: usize = 0x40020040;
+/// DMACHANNEL3(DMACHANNEL)基地址
+pub const DMACHANNEL3_BASE: usize = 0x40020060;
+/// DMACHANNEL4(DMACHANNEL)基地址
+pub const DMACHANNEL4_BASE: usize = 0x40020080;
+/// DMACHANNEL5(DMACHANNEL)基地址
+pub const DMACHANNEL5_BASE: usize = 0x400200a0;
 /// FLASH(FLASH)基地址
 pub const FLASH_BASE: usize = 0x40022000;
 /// GPIOA(GPIO)基地址
 pub const GPIOA_BASE: usize = 0x48000000;
+/// GPIOB(GPIO)基地址
+pub const GPIOB_BASE: usize = 0x48000400;
 /// GPIOC(GPIOC)基地址
 pub const GPIOC_BASE: usize = 0x48000800;
 /// GPIOF(GPIOF)基地址
 pub const GPIOF_BASE: usize = 0x48001400;
 /// GTIM1(GTIM)基地址
 pub const GTIM1_BASE: usize = 0x40000400;
+/// GTIM2(GTIM)基地址
+pub const GTIM2_BASE: usize = 0x40001000;
+/// GTIM3(GTIM)基地址
+pub const GTIM3_BASE: usize = 0x40014000;
+/// GTIM4(GTIM)基地址
+pub const GTIM4_BASE: usize = 0x40014400;
 /// I2C1(I2C)基地址
 pub const I2C1_BASE: usize = 0x40005400;
+/// I2C2(I2C)基地址
+pub const I2C2_BASE: usize = 0x40005800;
 /// IWDT(IWDT)基地址
 pub const IWDT_BASE: usize = 0x40003000;
 /// LVD(LVD)基地址
@@ -95,12 +117,20 @@ pub const RAM_BASE: usize = 0x40022400;
 pub const RTC_BASE: usize = 0x40002800;
 /// SPI1(SPI)基地址
 pub const SPI1_BASE: usize = 0x40013000;
+/// SPI2(SPI)基地址
+pub const SPI2_BASE: usize = 0x40003800;
 /// SYSCTRL(SYSCTRL)基地址
 pub const SYSCTRL_BASE: usize = 0x40010000;
 /// UART1(UART)基地址
 pub const UART1_BASE: usize = 0x40013800;
+/// UART2(UART)基地址
+pub const UART2_BASE: usize = 0x40004400;
+/// UART3(UART)基地址
+pub const UART3_BASE: usize = 0x40004800;
 /// VC1(VC)基地址
 pub const VC1_BASE: usize = 0x40012a00;
+/// VC2(VC)基地址
+pub const VC2_BASE: usize = 0x40012a10;
 /// WWDT(WWDT)基地址
 pub const WWDT_BASE: usize = 0x40002c00;
 
@@ -224,6 +254,10 @@ pub struct AWT {
 /// `BTIM` 寄存器组(生成自厂商头文件)
 ///
 /// - `BTIM1` 基地址 `0X40014800`
+///
+/// - `BTIM2` 基地址 `0X40014900`
+///
+/// - `BTIM3` 基地址 `0X40014A00`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct BTIM {
@@ -331,6 +365,14 @@ pub struct DMA {
 /// `DMACHANNEL` 寄存器组(生成自厂商头文件)
 ///
 /// - `DMACHANNEL1` 基地址 `0X40020020`
+///
+/// - `DMACHANNEL2` 基地址 `0X40020040`
+///
+/// - `DMACHANNEL3` 基地址 `0X40020060`
+///
+/// - `DMACHANNEL4` 基地址 `0X40020080`
+///
+/// - `DMACHANNEL5` 基地址 `0X400200A0`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct DMACHANNEL {
@@ -370,6 +412,8 @@ pub struct FLASH {
 /// `GPIO` 寄存器组(生成自厂商头文件)
 ///
 /// - `GPIOA` 基地址 `0X48000000`
+///
+/// - `GPIOB` 基地址 `0X48000400`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct GPIO {
@@ -527,6 +571,12 @@ pub struct GPIOF {
 /// `GTIM` 寄存器组(生成自厂商头文件)
 ///
 /// - `GTIM1` 基地址 `0X40000400`
+///
+/// - `GTIM2` 基地址 `0X40001000`
+///
+/// - `GTIM3` 基地址 `0X40014000`
+///
+/// - `GTIM4` 基地址 `0X40014400`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct GTIM {
@@ -565,6 +615,8 @@ pub struct GTIM {
 /// `I2C` 寄存器组(生成自厂商头文件)
 ///
 /// - `I2C1` 基地址 `0X40005400`
+///
+/// - `I2C2` 基地址 `0X40005800`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct I2C {
@@ -681,6 +733,8 @@ pub struct RTC {
 /// `SPI` 寄存器组(生成自厂商头文件)
 ///
 /// - `SPI1` 基地址 `0X40013000`
+///
+/// - `SPI2` 基地址 `0X40003800`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct SPI {
@@ -769,6 +823,10 @@ pub struct SYSCTRL {
 /// `UART` 寄存器组(生成自厂商头文件)
 ///
 /// - `UART1` 基地址 `0X40013800`
+///
+/// - `UART2` 基地址 `0X40004400`
+///
+/// - `UART3` 基地址 `0X40004800`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct UART {
@@ -801,6 +859,8 @@ pub struct UART {
 /// `VC` 寄存器组(生成自厂商头文件)
 ///
 /// - `VC1` 基地址 `0X40012A00`
+///
+/// - `VC2` 基地址 `0X40012A10`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct VC {
@@ -6367,24 +6427,46 @@ pub struct Peripherals {
     pub awt: &'static AWT,
     /// BTIM1
     pub btim1: &'static BTIM,
+    /// BTIM2
+    pub btim2: &'static BTIM,
+    /// BTIM3
+    pub btim3: &'static BTIM,
     /// CRC
     pub crc: &'static CRC,
     /// DMA
     pub dma: &'static DMA,
     /// DMACHANNEL1
     pub dmachannel1: &'static DMACHANNEL,
+    /// DMACHANNEL2
+    pub dmachannel2: &'static DMACHANNEL,
+    /// DMACHANNEL3
+    pub dmachannel3: &'static DMACHANNEL,
+    /// DMACHANNEL4
+    pub dmachannel4: &'static DMACHANNEL,
+    /// DMACHANNEL5
+    pub dmachannel5: &'static DMACHANNEL,
     /// FLASH
     pub flash: &'static FLASH,
     /// GPIOA
     pub gpioa: &'static GPIO,
+    /// GPIOB
+    pub gpiob: &'static GPIO,
     /// GPIOC
     pub gpioc: &'static GPIOC,
     /// GPIOF
     pub gpiof: &'static GPIOF,
     /// GTIM1
     pub gtim1: &'static GTIM,
+    /// GTIM2
+    pub gtim2: &'static GTIM,
+    /// GTIM3
+    pub gtim3: &'static GTIM,
+    /// GTIM4
+    pub gtim4: &'static GTIM,
     /// I2C1
     pub i2_c1: &'static I2C,
+    /// I2C2
+    pub i2_c2: &'static I2C,
     /// IWDT
     pub iwdt: &'static IWDT,
     /// LVD
@@ -6395,12 +6477,20 @@ pub struct Peripherals {
     pub rtc: &'static RTC,
     /// SPI1
     pub spi1: &'static SPI,
+    /// SPI2
+    pub spi2: &'static SPI,
     /// SYSCTRL
     pub sysctrl: &'static SYSCTRL,
     /// UART1
     pub uart1: &'static UART,
+    /// UART2
+    pub uart2: &'static UART,
+    /// UART3
+    pub uart3: &'static UART,
     /// VC1
     pub vc1: &'static VC,
+    /// VC2
+    pub vc2: &'static VC,
     /// WWDT
     pub wwdt: &'static WWDT,
 }
@@ -6425,23 +6515,38 @@ impl Peripherals {
             atim: unsafe { &*(ATIM_BASE as *const ATIM) },
             awt: unsafe { &*(AWT_BASE as *const AWT) },
             btim1: unsafe { &*(BTIM1_BASE as *const BTIM) },
+            btim2: unsafe { &*(BTIM2_BASE as *const BTIM) },
+            btim3: unsafe { &*(BTIM3_BASE as *const BTIM) },
             crc: unsafe { &*(CRC_BASE as *const CRC) },
             dma: unsafe { &*(DMA_BASE as *const DMA) },
             dmachannel1: unsafe { &*(DMACHANNEL1_BASE as *const DMACHANNEL) },
+            dmachannel2: unsafe { &*(DMACHANNEL2_BASE as *const DMACHANNEL) },
+            dmachannel3: unsafe { &*(DMACHANNEL3_BASE as *const DMACHANNEL) },
+            dmachannel4: unsafe { &*(DMACHANNEL4_BASE as *const DMACHANNEL) },
+            dmachannel5: unsafe { &*(DMACHANNEL5_BASE as *const DMACHANNEL) },
             flash: unsafe { &*(FLASH_BASE as *const FLASH) },
             gpioa: unsafe { &*(GPIOA_BASE as *const GPIO) },
+            gpiob: unsafe { &*(GPIOB_BASE as *const GPIO) },
             gpioc: unsafe { &*(GPIOC_BASE as *const GPIOC) },
             gpiof: unsafe { &*(GPIOF_BASE as *const GPIOF) },
             gtim1: unsafe { &*(GTIM1_BASE as *const GTIM) },
+            gtim2: unsafe { &*(GTIM2_BASE as *const GTIM) },
+            gtim3: unsafe { &*(GTIM3_BASE as *const GTIM) },
+            gtim4: unsafe { &*(GTIM4_BASE as *const GTIM) },
             i2_c1: unsafe { &*(I2C1_BASE as *const I2C) },
+            i2_c2: unsafe { &*(I2C2_BASE as *const I2C) },
             iwdt: unsafe { &*(IWDT_BASE as *const IWDT) },
             lvd: unsafe { &*(LVD_BASE as *const LVD) },
             ram: unsafe { &*(RAM_BASE as *const RAM) },
             rtc: unsafe { &*(RTC_BASE as *const RTC) },
             spi1: unsafe { &*(SPI1_BASE as *const SPI) },
+            spi2: unsafe { &*(SPI2_BASE as *const SPI) },
             sysctrl: unsafe { &*(SYSCTRL_BASE as *const SYSCTRL) },
             uart1: unsafe { &*(UART1_BASE as *const UART) },
+            uart2: unsafe { &*(UART2_BASE as *const UART) },
+            uart3: unsafe { &*(UART3_BASE as *const UART) },
             vc1: unsafe { &*(VC1_BASE as *const VC) },
+            vc2: unsafe { &*(VC2_BASE as *const VC) },
             wwdt: unsafe { &*(WWDT_BASE as *const WWDT) },
         }
     }
