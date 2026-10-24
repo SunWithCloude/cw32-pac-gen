@@ -1,0 +1,8 @@
+/* CW32L083 存储器布局(家族最大配置:Flash 256K / SRAM 24K) */
+MEMORY
+{
+  FLASH : ORIGIN = 0x00000000, LENGTH = 256K
+  RAM   : ORIGIN = 0x20000000, LENGTH = 24K
+}
+
+_stack_start = ORIGIN(RAM) + LENGTH(RAM);

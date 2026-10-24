@@ -1,0 +1,8 @@
+/* CW32F003 存储器布局(家族最大配置:Flash 20K / SRAM 3K) */
+MEMORY
+{
+  FLASH : ORIGIN = 0x00000000, LENGTH = 20K
+  RAM   : ORIGIN = 0x20000000, LENGTH = 3K
+}
+
+_stack_start = ORIGIN(RAM) + LENGTH(RAM);
