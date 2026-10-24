@@ -14,3 +14,12 @@ cortex-m-rt = { version = "0.7", optional = true, features = ["device"] }
 
 [features]
 rt = ["dep:cortex-m-rt"]
+
+[dev-dependencies]
+# 示例直接依赖 cortex-m-rt:rt 模块只有数据、不引用其符号,
+# 不加的话 rustc 不会把 rlib 传给链接器,link.x 的 DefaultHandler_ 会缺
+cortex-m-rt = { version = "0.7", features = ["device"] }
+
+[[example]]
+name = "blink"
+required-features = ["rt"]

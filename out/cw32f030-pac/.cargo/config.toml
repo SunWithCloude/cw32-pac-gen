@@ -1,0 +1,6 @@
+# thumb* 目标默认 rust-lld;link.x 会 INCLUDE 本 crate 的 memory.x
+# 与 rt feature 生成的 device.x。
+[target.thumbv6m-none-eabi]
+rustflags = [
+    "-C", "link-arg=-Tlink.x",
+]

@@ -16,6 +16,15 @@
 - 未吸收:其 metapac 生成架构、embassy 驱动(另行按文件级吸收,见
   embassy-cw32 仓库 THIRD_PARTY.md)。
 
+## 2026-10-24 补充:SDK zip 哈希偏离
+
+从厂商 URL 重新下载的 `CW32F030_StandardPeripheralLib_V2.2.zip`
+SHA-256 为 `7c431df4...`,与上游锁定的 `c59bdc21...` 不一致(厂商可能
+在 2026-10-08 快照后更新过同名文件)。所用 DFP 1.0.5 的 FLM 烧写算法
+已在实机验证可用(见下)。`tools/CW32F030_Series.yaml` 由
+`tools/flm2yaml.py` 从该 DFP 的 `FlashCW32F030.FLM` 转换,烧录于
+2026-10-24 在 CW32F030C8T6 实板验证通过。
+
 ## 生成产物中的厂商数据
 
 各 `out/<family>-pac` crate 的寄存器名/偏移/尺寸/中断号转录自上述
