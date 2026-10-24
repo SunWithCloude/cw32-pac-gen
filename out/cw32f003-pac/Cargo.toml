@@ -1,3 +1,8 @@
+[dev-dependencies]
+# 示例直接依赖:rt 模块只有数据、不引用其符号,不加的话 rustc 不会把
+# rlib 传给链接器,link.x 的 DefaultHandler_ 会缺;示例里还要 use _; 强制引用
+cortex-m-rt = { version = "0.7", features = ["device"] }
+
 [package]
 name = "cw32f003-pac"
 version = "0.1.0"

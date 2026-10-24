@@ -51,6 +51,11 @@ def parse_header(path: str):
     reg_re = re.compile(
         r"__(IOM|IM|OM)\s+uint32_t\s+(\w+)\s*;\s*/\*!<\s*\(@\s*(0x[0-9A-Fa-f]+)\)"
     )
+    bitfield_re = re.compile(
+        r"struct\s*\{([^{}]*)\}\s*(\w+)_f\s*;", re.S)
+    field_re = re.compile(
+        r"uint32_t\s+(\w+)\s*:\s*\d+\s*;\s*/\*!<\s*\[(\d+)\.\.(\d+)\]")
+
     for i, m in enumerate(starts):
         base, inst_name = int(m.group(1), 16), m.group(2)
         chunk_end = starts[i + 1].start() if i + 1 < len(starts) else len(src)
@@ -59,6 +64,17 @@ def parse_header(path: str):
         if not e:
             continue
         typ, size = e.group(1), int(e.group(2))
+        bitfields = {}
+        for fm in bitfield_re.finditer(body):
+            reg, fbody = fm.group(2).removesuffix('_f'), fm.group(1)
+            # 注释格式为 [hi..lo](高位在前)
+            fields = [
+                (f, min(int(a), int(b)), max(int(a), int(b)))
+                for f, a, b in field_re.findall(fbody)
+                if f  # 跳过匿名填充位
+            ]
+            if fields:
+                bitfields.setdefault(reg, fields)
         regs = []
         seen_off = set()
         for acc, name, off_s in reg_re.findall(body):
@@ -70,7 +86,8 @@ def parse_header(path: str):
             seen_off.add(off)
             regs.append((name, off, {"IOM": "rw", "IM": "ro", "OM": "wo"}[acc]))
         peripherals.append(
-            {"typ": typ, "instances": [(inst_name, base)], "regs": regs, "size": size}
+            {"typ": typ, "instances": [(inst_name, base)], "regs": regs,
+             "size": size, "bits": bitfields}
         )
 
     # 同 Typedef 的多实例合并(如 UART1/2/3 → UART_TypeDef)
@@ -79,6 +96,7 @@ def parse_header(path: str):
         for q in merged:
             if q["typ"] == p["typ"] and q["regs"] == p["regs"] and q["size"] == p["size"]:
                 q["instances"].extend(p["instances"])
+                q["bits"] = q["bits"] or p["bits"]
                 break
         else:
             merged.append(p)
@@ -161,7 +179,7 @@ def gen(family: str):
     # 稠密化:保留槽位补 RESERVEDn 占位(向量槽存在但无中断源,
     # device.x 照常 PROVIDE 到 DefaultHandler)
     top = interrupts[-1][1]
-    by_num = dict(interrupts)
+    by_num = {num: name for name, num in interrupts}  # 键必须是编号:dict(元组列表)会以名字为键
     interrupts = [(by_num.get(n, f"RESERVED{n}"), n) for n in range(top + 1)]
 
     crate = family.replace("-", "_")
@@ -206,6 +224,34 @@ def gen(family: str):
     for body, _, _ in struct_names:
         L.append(body)
         L.append("")
+
+    # 位段常量(头文件位域 [hi..lo] 注释转录;POS 为最低位,MASK 覆盖全宽)
+    L.append("// ================= 位段常量 =================")
+    for _, rust_name, p in struct_names:
+        if not p["bits"]:
+            continue
+        L.append(f"/// `{rust_name}` 位段常量")
+        L.append(f"pub mod {rust_name.lower()} {{")
+        kw = {"match", "ref", "in", "for", "if", "else", "do", "fn",
+              "box", "type", "use", "break", "continue", "loop", "while"}
+        def esc(n: str) -> str:
+            n = n.lower()
+            return "r#" + n if n in kw else n
+        for reg, fields in p["bits"].items():
+            if not fields:
+                continue
+            L.append(f"    /// {reg} 位域")
+            L.append("    #[allow(non_upper_case_globals)] // 保留与厂商头文件一致的字段拼写")
+            L.append(f"    pub mod {esc(reg)} {{")
+            for fname, lo, hi in fields:
+                width = hi - lo + 1
+                mask = ((1 << width) - 1) << lo
+                L.append(f"        /// {fname}[{hi}:{lo}]")
+                L.append(f"        pub const {esc(fname)}_POS: u32 = {lo};")
+                L.append(f"        pub const {esc(fname)}_MASK: u32 = 0x{mask:x};")
+            L.append("    }")
+        L.append("}")
+    L.append("")
 
     # 中断枚举
     L.append("// ================= 中断号 =================")
@@ -307,6 +353,12 @@ def gen(family: str):
     T.append("        assert_eq!(*n as usize, i, \"IRQ 表必须按 0..n 稠密排列\");")
     T.append("    }")
     T.append("    assert_eq!(all.len(), 1 + all.last().unwrap().1 as usize);")
+    # 真实中断名计数守卫:曾因 dict 键序颠倒导致全部退化为 RESERVED 占位,
+    # 编号稠密性测试抓不住——这里在生成期记下真实名数量并断言
+    real_n = sum(1 for nm, _ in interrupts if not nm.startswith("RESERVED"))
+    T.append(f"    // 真实中断名(非 RESERVED 占位)共 {real_n} 项,生成期锁定")
+    T.append("    let real = all.iter().filter(|(i, _)| !format!(\"{:?}\", i).contains(\"Reserved\")).count();")
+    T.append(f"    assert_eq!(real, {real_n});")
     T.append("}")
     open(os.path.join(out, "tests", "layout.rs"), "w", encoding="utf-8", newline="\n").write("\n".join(T))
 
@@ -328,7 +380,12 @@ def gen(family: str):
         open(os.path.join(os.path.dirname(__file__), "build_template.rs"), encoding="utf-8").read()
         .replace("__IRQS__", "\n".join(
             f'    ("{sym}", {n}),' for sym, n in interrupts)))
-    open(os.path.join(out, "Cargo.toml"), "w", encoding="utf-8", newline="\n").write(f"""[package]
+    open(os.path.join(out, "Cargo.toml"), "w", encoding="utf-8", newline="\n").write(f"""[dev-dependencies]
+# 示例直接依赖:rt 模块只有数据、不引用其符号,不加的话 rustc 不会把
+# rlib 传给链接器,link.x 的 DefaultHandler_ 会缺;示例里还要 use _; 强制引用
+cortex-m-rt = {{ version = "0.7", features = ["device"] }}
+
+[package]
 name = "{family}-pac"
 version = "0.1.0"
 edition = "2021"
@@ -345,6 +402,14 @@ cortex-m-rt = {{ version = "0.7", optional = true, features = ["device"] }}
 [features]
 rt = ["dep:cortex-m-rt"]
 """)
+    # 已有示例(如手工添加的 blink)自动补 required-features 门控,
+    # 避免宿主机 cargo test/clippy 去编译 no_std 示例
+    exdir = os.path.join(out, "examples")
+    if os.path.isdir(exdir):
+        for f in sorted(os.listdir(exdir)):
+            if f.endswith(".rs"):
+                open(os.path.join(out, "Cargo.toml"), "a", encoding="utf-8", newline="\n").write(
+                    f'\n[[example]]\nname = "{f[:-3]}"\nrequired-features = ["rt"]\n')
 
     print(f"生成 {out}")
     print(f"  外设块 {len(struct_names)} 个,实例 {len(periph_fields)} 个,中断 {len(interrupts)} 项")

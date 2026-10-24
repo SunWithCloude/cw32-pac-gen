@@ -28,39 +28,42 @@ fn block_sizes_match_vendor_headers() {
 #[test]
 fn interrupt_table_dense_and_ordered() {
     let all: [(Interrupt, u32); 30] = [
-        (Interrupt::Reserved0 , 0),
-        (Interrupt::Reserved1 , 1),
-        (Interrupt::Reserved2 , 2),
-        (Interrupt::Reserved3 , 3),
-        (Interrupt::Reserved4 , 4),
-        (Interrupt::Reserved5 , 5),
-        (Interrupt::Reserved6 , 6),
-        (Interrupt::Reserved7 , 7),
+        (Interrupt::Wdt , 0),
+        (Interrupt::Lvd , 1),
+        (Interrupt::Rtc , 2),
+        (Interrupt::Flashram , 3),
+        (Interrupt::Sysctrl , 4),
+        (Interrupt::Gpioa , 5),
+        (Interrupt::Gpiob , 6),
+        (Interrupt::Gpioc , 7),
         (Interrupt::Reserved8 , 8),
         (Interrupt::Reserved9 , 9),
         (Interrupt::Reserved10 , 10),
         (Interrupt::Reserved11 , 11),
-        (Interrupt::Reserved12 , 12),
-        (Interrupt::Reserved13 , 13),
-        (Interrupt::Reserved14 , 14),
-        (Interrupt::Reserved15 , 15),
-        (Interrupt::Reserved16 , 16),
-        (Interrupt::Reserved17 , 17),
+        (Interrupt::Adc , 12),
+        (Interrupt::Atim , 13),
+        (Interrupt::Vc1 , 14),
+        (Interrupt::Vc2 , 15),
+        (Interrupt::Gtim1 , 16),
+        (Interrupt::Gtim2 , 17),
         (Interrupt::Reserved18 , 18),
-        (Interrupt::Reserved19 , 19),
-        (Interrupt::Reserved20 , 20),
-        (Interrupt::Reserved21 , 21),
-        (Interrupt::Reserved22 , 22),
-        (Interrupt::Reserved23 , 23),
+        (Interrupt::Lptim , 19),
+        (Interrupt::Btim1 , 20),
+        (Interrupt::Btim2 , 21),
+        (Interrupt::Btim3 , 22),
+        (Interrupt::I2C , 23),
         (Interrupt::Reserved24 , 24),
-        (Interrupt::Reserved25 , 25),
+        (Interrupt::Spi , 25),
         (Interrupt::Reserved26 , 26),
-        (Interrupt::Reserved27 , 27),
-        (Interrupt::Reserved28 , 28),
-        (Interrupt::Reserved29 , 29),
+        (Interrupt::Uart1 , 27),
+        (Interrupt::Uart2 , 28),
+        (Interrupt::Uart3 , 29),
     ];
     for (i, (_, n)) in all.iter().enumerate() {
         assert_eq!(*n as usize, i, "IRQ 表必须按 0..n 稠密排列");
     }
     assert_eq!(all.len(), 1 + all.last().unwrap().1 as usize);
+    // 真实中断名(非 RESERVED 占位)共 23 项,生成期锁定
+    let real = all.iter().filter(|(i, _)| !format!("{:?}", i).contains("Reserved")).count();
+    assert_eq!(real, 23);
 }
