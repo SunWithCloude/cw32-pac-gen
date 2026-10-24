@@ -106,32 +106,6 @@ variants:
     - main
   flash_algorithms:
   - flashcw32f030
-- name: CW32A030C8
-  cores:
-  - name: main
-    type: armv6m
-    core_access_options: !Arm
-      ap: !v1 0
-  memory_map:
-  - !Nvm
-    name: IROM1
-    range:
-      start: 0x0
-      end: 0x10000
-    cores:
-    - main
-    access:
-      write: false
-      boot: true
-  - !Ram
-    name: IRAM1
-    range:
-      start: 0x20000000
-      end: 0x20002000
-    cores:
-    - main
-  flash_algorithms:
-  - flashcw32f030
 flash_algorithms:
 - name: flashcw32f030
   description: CW32F030 (from WHXY.CW32F030_DFP 1.0.5 FlashCW32F030.FLM)

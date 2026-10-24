@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-"""从 F030 DFP 的 FLM 提取烧写算法,生成 probe-rs 目标定义 CW32F030_Series.yaml"""
+"""从 F030 DFP 的 FLM 提取烧写算法,生成 probe-rs 目标定义 CW32F030_Series.yaml
+
+DevDscr(FlashDevice 结构)按 Open-CMSIS-Pack 规范解析:
+https://open-cmsis-pack.github.io/Open-CMSIS-Pack-Spec/main/html/flashAlgorithm.html
+字段序:Version u16 / DevName char[128] / DevType u16 / (对齐) DevAdr u32 /
+szDev u32 / szPage u32 / Res u32 / ValEmpty u8 (对齐) / TOProg u32 (ms) /
+TOErase u32 (ms) / 扇区表 {u32 size, u32 startAddr}... / SECTOR_END
+(0xFFFFFFFF,0xFFFFFFFF)。注意:扇区条目第二项是**起始地址**而非数量;
+单一尺寸类覆盖到下一条目起始或设备末尾。"""
 import base64
 import struct
 import subprocess
@@ -37,6 +45,25 @@ def parse_elf(path):
     return prg_code + prg_data, sections["PrgData"][1], syms  # data 段的 VMA==PrgCode 大小
 
 blob, data_size, syms = parse_elf(FLM)
+
+# ---- DevDscr 按规范解析(校验页大小/扇区,不再依赖记忆) ----
+raw = open(FLM, "rb").read()
+DD_FILE_OFF, DD_SIZE = 0x2ac, 0x10a0
+dd = raw[DD_FILE_OFF:DD_FILE_OFF + DD_SIZE]
+import struct as _st
+_szpage, = _st.unpack_from("<I", dd, 0x8C)
+_valemp, = _st.unpack_from("<B", dd, 0x94)
+_toprog, = _st.unpack_from("<I", dd, 0x98)
+_toerase, = _st.unpack_from("<I", dd, 0x9C)
+_sectors = []
+_off = 0xA0
+while _off + 8 <= len(dd):
+    _sz, _ad = _st.unpack_from("<II", dd, _off)
+    if _sz == 0xFFFFFFFF:
+        break
+    _sectors.append((_sz, _ad))
+    _off += 8
+assert _sectors and _sectors[0][0] == 0x200 and _sectors[0][1] == 0, _sectors
 b64 = base64.b64encode(blob).decode()
 data_off = len(blob) - data_size  # data_section_offset = PrgCode 大小
 
@@ -44,7 +71,6 @@ data_off = len(blob) - data_size  # data_section_offset = PrgCode 大小
 variants = [
     ("CW32F030C8", 0x10000), ("CW32F030K8", 0x10000),
     ("CW32F030F8", 0x10000), ("CW32F030F6", 0x8000),
-    ("CW32A030C8", 0x10000),  # A030 寄存器/Flash 同 F030C8
 ]
 
 y = []
@@ -94,13 +120,14 @@ y.append("  flash_properties:")
 y.append("    address_range:")
 y.append("      start: 0x0")
 y.append("      end: 0x10000")
-y.append("    page_size: 0x200")
-y.append("    erased_byte_value: 0xff")
-y.append("    program_page_timeout: 100")
-y.append("    erase_sector_timeout: 3000")
+y.append(f"    page_size: 0x{_szpage:x}")
+y.append(f"    erased_byte_value: 0x{_valemp:02x}")
+y.append(f"    program_page_timeout: {_toprog}")
+y.append(f"    erase_sector_timeout: {_toerase}")
 y.append("    sectors:")
-y.append("    - size: 0x200")
-y.append("      address: 0x0")
+for _sz, _ad in _sectors:
+    y.append(f"    - size: 0x{_sz:x}")
+    y.append(f"      address: 0x{_ad:x}")
 
 open(OUT, "w", encoding="utf-8", newline="\n").write("\n".join(y) + "\n")
 print(f"写出 {OUT}")
