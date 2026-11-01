@@ -67,12 +67,18 @@ pub const ATIM_BASE: usize = 0x40012c00;
 pub const AWT_BASE: usize = 0x40014c00;
 /// BTIM1(BTIM)基地址
 pub const BTIM1_BASE: usize = 0x40014800;
+/// BTIM2(BTIM)基地址
+pub const BTIM2_BASE: usize = 0x40014900;
+/// BTIM3(BTIM)基地址
+pub const BTIM3_BASE: usize = 0x40014a00;
 /// CRC(CRC)基地址
 pub const CRC_BASE: usize = 0x40023000;
 /// FLASH(FLASH)基地址
 pub const FLASH_BASE: usize = 0x40022000;
 /// GPIOA(GPIO)基地址
 pub const GPIOA_BASE: usize = 0x48000000;
+/// GPIOB(GPIO)基地址
+pub const GPIOB_BASE: usize = 0x48000400;
 /// GPIOC(GPIOC)基地址
 pub const GPIOC_BASE: usize = 0x48000800;
 /// GTIM(GTIM)基地址
@@ -91,8 +97,12 @@ pub const SPI_BASE: usize = 0x40013000;
 pub const SYSCTRL_BASE: usize = 0x40010000;
 /// UART1(UART)基地址
 pub const UART1_BASE: usize = 0x40013800;
+/// UART2(UART)基地址
+pub const UART2_BASE: usize = 0x40004400;
 /// VC1(VC)基地址
 pub const VC1_BASE: usize = 0x40012a00;
+/// VC2(VC)基地址
+pub const VC2_BASE: usize = 0x40012a10;
 /// WWDT(WWDT)基地址
 pub const WWDT_BASE: usize = 0x40002c00;
 
@@ -226,6 +236,10 @@ pub struct AWT {
 /// `BTIM` 寄存器组(生成自厂商头文件)
 ///
 /// - `BTIM1` 基地址 `0X40014800`
+///
+/// - `BTIM2` 基地址 `0X40014900`
+///
+/// - `BTIM3` 基地址 `0X40014A00`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct BTIM {
@@ -285,6 +299,8 @@ pub struct FLASH {
 /// `GPIO` 寄存器组(生成自厂商头文件)
 ///
 /// - `GPIOA` 基地址 `0X48000000`
+///
+/// - `GPIOB` 基地址 `0X48000400`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct GPIO {
@@ -576,6 +592,8 @@ pub struct SYSCTRL {
 /// `UART` 寄存器组(生成自厂商头文件)
 ///
 /// - `UART1` 基地址 `0X40013800`
+///
+/// - `UART2` 基地址 `0X40004400`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct UART {
@@ -608,6 +626,8 @@ pub struct UART {
 /// `VC` 寄存器组(生成自厂商头文件)
 ///
 /// - `VC1` 基地址 `0X40012A00`
+///
+/// - `VC2` 基地址 `0X40012A10`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct VC {
@@ -4234,12 +4254,18 @@ pub struct Peripherals {
     pub awt: &'static AWT,
     /// BTIM1
     pub btim1: &'static BTIM,
+    /// BTIM2
+    pub btim2: &'static BTIM,
+    /// BTIM3
+    pub btim3: &'static BTIM,
     /// CRC
     pub crc: &'static CRC,
     /// FLASH
     pub flash: &'static FLASH,
     /// GPIOA
     pub gpioa: &'static GPIO,
+    /// GPIOB
+    pub gpiob: &'static GPIO,
     /// GPIOC
     pub gpioc: &'static GPIOC,
     /// GTIM
@@ -4258,8 +4284,12 @@ pub struct Peripherals {
     pub sysctrl: &'static SYSCTRL,
     /// UART1
     pub uart1: &'static UART,
+    /// UART2
+    pub uart2: &'static UART,
     /// VC1
     pub vc1: &'static VC,
+    /// VC2
+    pub vc2: &'static VC,
     /// WWDT
     pub wwdt: &'static WWDT,
 }
@@ -4284,9 +4314,12 @@ impl Peripherals {
             atim: unsafe { &*(ATIM_BASE as *const ATIM) },
             awt: unsafe { &*(AWT_BASE as *const AWT) },
             btim1: unsafe { &*(BTIM1_BASE as *const BTIM) },
+            btim2: unsafe { &*(BTIM2_BASE as *const BTIM) },
+            btim3: unsafe { &*(BTIM3_BASE as *const BTIM) },
             crc: unsafe { &*(CRC_BASE as *const CRC) },
             flash: unsafe { &*(FLASH_BASE as *const FLASH) },
             gpioa: unsafe { &*(GPIOA_BASE as *const GPIO) },
+            gpiob: unsafe { &*(GPIOB_BASE as *const GPIO) },
             gpioc: unsafe { &*(GPIOC_BASE as *const GPIOC) },
             gtim: unsafe { &*(GTIM_BASE as *const GTIM) },
             i2_c: unsafe { &*(I2C_BASE as *const I2C) },
@@ -4296,7 +4329,9 @@ impl Peripherals {
             spi: unsafe { &*(SPI_BASE as *const SPI) },
             sysctrl: unsafe { &*(SYSCTRL_BASE as *const SYSCTRL) },
             uart1: unsafe { &*(UART1_BASE as *const UART) },
+            uart2: unsafe { &*(UART2_BASE as *const UART) },
             vc1: unsafe { &*(VC1_BASE as *const VC) },
+            vc2: unsafe { &*(VC2_BASE as *const VC) },
             wwdt: unsafe { &*(WWDT_BASE as *const WWDT) },
         }
     }
