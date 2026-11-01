@@ -65,14 +65,24 @@ pub const ADC_BASE: usize = 0x40000000;
 pub const ATIM_BASE: usize = 0x40001400;
 /// BTIM1(BTIM)基地址
 pub const BTIM1_BASE: usize = 0x40004800;
+/// BTIM2(BTIM)基地址
+pub const BTIM2_BASE: usize = 0x40004840;
+/// BTIM3(BTIM)基地址
+pub const BTIM3_BASE: usize = 0x40004880;
 /// CRC(CRC)基地址
 pub const CRC_BASE: usize = 0x40023000;
 /// FLASH(FLASH)基地址
 pub const FLASH_BASE: usize = 0x40022000;
 /// GPIOA(GPIO)基地址
 pub const GPIOA_BASE: usize = 0x48000000;
+/// GPIOB(GPIO)基地址
+pub const GPIOB_BASE: usize = 0x48000100;
+/// GPIOC(GPIO)基地址
+pub const GPIOC_BASE: usize = 0x48000200;
 /// GTIM1(GTIM)基地址
 pub const GTIM1_BASE: usize = 0x40001800;
+/// GTIM2(GTIM)基地址
+pub const GTIM2_BASE: usize = 0x40001c00;
 /// I2C(I2C)基地址
 pub const I2C_BASE: usize = 0x40005400;
 /// IRMOD(IRMOD)基地址
@@ -83,6 +93,10 @@ pub const IWDT_BASE: usize = 0x40005000;
 pub const LPTIM_BASE: usize = 0x40006000;
 /// UART1(UART)基地址
 pub const UART1_BASE: usize = 0x40000c00;
+/// UART2(UART)基地址
+pub const UART2_BASE: usize = 0x40001000;
+/// UART3(UART)基地址
+pub const UART3_BASE: usize = 0x40002000;
 /// LVD(LVD)基地址
 pub const LVD_BASE: usize = 0x400000d0;
 /// RAM(RAM)基地址
@@ -95,6 +109,8 @@ pub const SPI_BASE: usize = 0x40000800;
 pub const SYSCTRL_BASE: usize = 0x40004000;
 /// VC1(VC)基地址
 pub const VC1_BASE: usize = 0x400000a4;
+/// VC2(VC)基地址
+pub const VC2_BASE: usize = 0x400000b4;
 /// VCDIV(VCDIV)基地址
 pub const VCDIV_BASE: usize = 0x400000a0;
 
@@ -219,6 +235,10 @@ pub struct ATIM {
 /// `BTIM` 寄存器组(生成自厂商头文件)
 ///
 /// - `BTIM1` 基地址 `0X40004800`
+///
+/// - `BTIM2` 基地址 `0X40004840`
+///
+/// - `BTIM3` 基地址 `0X40004880`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct BTIM {
@@ -287,6 +307,10 @@ pub struct FLASH {
 /// `GPIO` 寄存器组(生成自厂商头文件)
 ///
 /// - `GPIOA` 基地址 `0X48000000`
+///
+/// - `GPIOB` 基地址 `0X48000100`
+///
+/// - `GPIOC` 基地址 `0X48000200`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct GPIO {
@@ -332,6 +356,8 @@ pub struct GPIO {
 /// `GTIM` 寄存器组(生成自厂商头文件)
 ///
 /// - `GTIM1` 基地址 `0X40001800`
+///
+/// - `GTIM2` 基地址 `0X40001C00`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct GTIM {
@@ -467,6 +493,10 @@ pub struct LPTIM {
 /// `UART` 寄存器组(生成自厂商头文件)
 ///
 /// - `UART1` 基地址 `0X40000C00`
+///
+/// - `UART2` 基地址 `0X40001000`
+///
+/// - `UART3` 基地址 `0X40002000`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct UART {
@@ -653,6 +683,8 @@ pub struct SYSCTRL {
 /// `VC` 寄存器组(生成自厂商头文件)
 ///
 /// - `VC1` 基地址 `0X400000A4`
+///
+/// - `VC2` 基地址 `0X400000B4`
 #[allow(dead_code)]
 #[repr(C)]
 pub struct VC {
@@ -5492,14 +5524,24 @@ pub struct Peripherals {
     pub atim: &'static ATIM,
     /// BTIM1
     pub btim1: &'static BTIM,
+    /// BTIM2
+    pub btim2: &'static BTIM,
+    /// BTIM3
+    pub btim3: &'static BTIM,
     /// CRC
     pub crc: &'static CRC,
     /// FLASH
     pub flash: &'static FLASH,
     /// GPIOA
     pub gpioa: &'static GPIO,
+    /// GPIOB
+    pub gpiob: &'static GPIO,
+    /// GPIOC
+    pub gpioc: &'static GPIO,
     /// GTIM1
     pub gtim1: &'static GTIM,
+    /// GTIM2
+    pub gtim2: &'static GTIM,
     /// I2C
     pub i2_c: &'static I2C,
     /// IRMOD
@@ -5510,6 +5552,10 @@ pub struct Peripherals {
     pub lptim: &'static LPTIM,
     /// UART1
     pub uart1: &'static UART,
+    /// UART2
+    pub uart2: &'static UART,
+    /// UART3
+    pub uart3: &'static UART,
     /// LVD
     pub lvd: &'static LVD,
     /// RAM
@@ -5522,6 +5568,8 @@ pub struct Peripherals {
     pub sysctrl: &'static SYSCTRL,
     /// VC1
     pub vc1: &'static VC,
+    /// VC2
+    pub vc2: &'static VC,
     /// VCDIV
     pub vcdiv: &'static VCDIV,
 }
@@ -5545,21 +5593,29 @@ impl Peripherals {
             adc: unsafe { &*(ADC_BASE as *const ADC) },
             atim: unsafe { &*(ATIM_BASE as *const ATIM) },
             btim1: unsafe { &*(BTIM1_BASE as *const BTIM) },
+            btim2: unsafe { &*(BTIM2_BASE as *const BTIM) },
+            btim3: unsafe { &*(BTIM3_BASE as *const BTIM) },
             crc: unsafe { &*(CRC_BASE as *const CRC) },
             flash: unsafe { &*(FLASH_BASE as *const FLASH) },
             gpioa: unsafe { &*(GPIOA_BASE as *const GPIO) },
+            gpiob: unsafe { &*(GPIOB_BASE as *const GPIO) },
+            gpioc: unsafe { &*(GPIOC_BASE as *const GPIO) },
             gtim1: unsafe { &*(GTIM1_BASE as *const GTIM) },
+            gtim2: unsafe { &*(GTIM2_BASE as *const GTIM) },
             i2_c: unsafe { &*(I2C_BASE as *const I2C) },
             irmod: unsafe { &*(IRMOD_BASE as *const IRMOD) },
             iwdt: unsafe { &*(IWDT_BASE as *const IWDT) },
             lptim: unsafe { &*(LPTIM_BASE as *const LPTIM) },
             uart1: unsafe { &*(UART1_BASE as *const UART) },
+            uart2: unsafe { &*(UART2_BASE as *const UART) },
+            uart3: unsafe { &*(UART3_BASE as *const UART) },
             lvd: unsafe { &*(LVD_BASE as *const LVD) },
             ram: unsafe { &*(RAM_BASE as *const RAM) },
             rtc: unsafe { &*(RTC_BASE as *const RTC) },
             spi: unsafe { &*(SPI_BASE as *const SPI) },
             sysctrl: unsafe { &*(SYSCTRL_BASE as *const SYSCTRL) },
             vc1: unsafe { &*(VC1_BASE as *const VC) },
+            vc2: unsafe { &*(VC2_BASE as *const VC) },
             vcdiv: unsafe { &*(VCDIV_BASE as *const VCDIV) },
         }
     }
